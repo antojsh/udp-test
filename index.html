@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Datagram</title>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+</head>
+<body>
+	<div id='div' style="padding:0; margin:0;width: 100%; height: 90vh; border: 1px solid black; overflow: scroll;"></div>
+	<button>Start / Stop</button>
+<script>
+  var bandera = false;
+  var socket = io('http://localhost:3000');
+  var div = document.getElementById('div')
+  socket.on('news', function (data) {
+  	//if(bandera){
+  		$('#div').prepend(data+'<br>')
+  	//}
+  	
+  });
+
+  $('button').click(function(){
+  	bandera=!bandera;
+  })
+</script>
+</body>
+</html>
