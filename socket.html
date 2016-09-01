@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Go Web</title>
+	<script src="http://cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
+</head>
+<body>
+	<script>
+		 var sock = new SockJS('http://localhost:3000/echo');
+		 sock.onopen = function() {
+		     console.log('open');
+		 };
+		 sock.onmessage = function(e) {
+		     console.log('message', e.data);
+		 };
+		 sock.onclose = function() {
+		     console.log('close');
+		 };
+
+		 sock.send('test');
+		 sock.close();
+	</script>
+</body>
+</html>

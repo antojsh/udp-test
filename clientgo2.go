@@ -3,7 +3,7 @@ package main
 import (
     "fmt"
     "net"
-    "time"
+    //"time"
     "strconv"
 )
  
@@ -33,6 +33,6 @@ func main() {
         if err != nil {
             fmt.Println(msg, err)
         }
-        time.Sleep(50 * time.Millisecond)
+        //time.Sleep(50 * time.Millisecond)
     }
 }

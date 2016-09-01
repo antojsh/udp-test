@@ -1,14 +1,18 @@
 {
-  "name": "udp",
+  "name": "Servidor_UDP",
   "version": "1.0.0",
-  "description": "",
-  "main": "upd.js",
+  "description": "Para los frontales",
+  "main": "udp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Antonio Sierra Hurtado",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.0.1",
+    "dgram": "^1.0.1",
+    "mongoose": "^4.5.10",
+    "net": "^1.0.2",
     "socket.io": "^1.4.8"
   }
 }

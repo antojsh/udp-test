@@ -10,7 +10,13 @@ import (
     //"github.com/gorilla/mux"
     "time"
     "net/http"
-    "log"
+    "io/ioutil"
+   // "log"
+    //"sync"
+    //"gopkg.in/igm/sockjs-go.v2/sockjs"
+    //"golang.org/x/net/websocket"
+//"io"
+    //"github.com/gin-gonic/gin"
     //"code.google.com/p/go.net/websocket"
 )
 type datagrams struct {
@@ -19,7 +25,10 @@ type datagrams struct {
     Timestamp time.Time
 }
 
-
+// var usersConects []*websocket.Conn
+type msg struct {
+    Num string
+}
 
 func CheckError(err error) {
     if err  != nil {
@@ -38,7 +47,7 @@ func main() {
     defer ServerConn.Close()
 
     buf := make([]byte, 1024)
-
+   
     for {
         n,_,err := ServerConn.ReadFromUDP(buf)
         //fmt.Println("Received ",string(buf[0:n]), " from ",addr)
@@ -50,56 +59,83 @@ func main() {
 
         if err != nil {
             panic(err)
-        } 
+        }
+
+        // for _, user := range usersConects {
+        //     fmt.Println("USER")
+        //     fmt.Println(len(user))
+        //     websocket.JSON.Send(user, "xdjlhkl")
+        // }
+        
+        
+
     }
     
 }
-func runserver(){
-      http.HandleFunc("/echo", echoHandler)
-      //http.Handle("/", http.FileServer(http.Dir(".")))
-      err := http.ListenAndServe(":3000", nil)
-      if err != nil {
-        panic("Error: " + err.Error())
-      }
-}
-var upgrader = websocket.Upgrader{
+var wsupgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
-    CheckOrigin: func(r *http.Request) bool {
-        return true
-    },
 }
- 
-func print_binary(s []byte) {
-  fmt.Printf("Received b:");
-  for n := 0;n < len(s);n++ {
-    fmt.Printf("%d,",s[n]);
-  }
-  fmt.Printf("\n");
-}
- 
-func echoHandler(w http.ResponseWriter, r *http.Request) {
 
-    conn, err := upgrader.Upgrade(w, r, nil)
+func wshandler(w http.ResponseWriter, r *http.Request) {
+    conn, err := wsupgrader.Upgrade(w, r, nil)
     if err != nil {
-        log.Println(err)
+        fmt.Println("Failed to set websocket upgrade: %+v", err)
         return
     }
- 
+
     for {
-        messageType, p, err := conn.ReadMessage()
+        t, msg, err := conn.ReadMessage()
         if err != nil {
-            return
+            break
         }
- 
-        print_binary(p)
-        //fmt.Printf(string(messageType));
-        err := conn.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
+        conn.WriteMessage(t, msg)
+    }
+}
+func runserver(){
+    http.HandleFunc("/ws", wsHandler)
+    http.HandleFunc("/", rootHandler)
+
+    panic(http.ListenAndServe(":8080", nil))
+}
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+    content, err := ioutil.ReadFile("index.html")
+    if err != nil {
+        fmt.Println("Could not open file.", err)
+    }
+    fmt.Fprintf(w, "%s", content)
+}
+
+func wsHandler(w http.ResponseWriter, r *http.Request) {
+    if r.Header.Get("Origin") != "http://"+r.Host {
+        http.Error(w, "Origin not allowed", 403)
+        return
+    }
+    conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
+    if err != nil {
+        http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
+    }
+
+    go echo(conn)
+}
+
+func echo(conn *websocket.Conn) {
+    for {
+        
+        m := msg{}
+        err := conn.ReadJSON(&m)
         if err != nil {
-            log.Fatal(err)
+            fmt.Println("Error reading json.", err)
+        }
+
+        fmt.Printf("Got message: %#v\n", m)
+
+        if err = conn.WriteJSON(m); err != nil {
+            fmt.Println(err)
         }
     }
 }
+
 
 func getSession() *mgo.Session {  
     s, err := mgo.Dial("mongodb://localhost/")
