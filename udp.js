@@ -62,10 +62,13 @@ io.on('connection', function (socket) {
 	    console.log(data);
 	});
 });
+
 net.createServer(function(sock) {
-    telnetConects.push(sock)
-    // We have a connection - a socket object is assigned to the connection automatically
-    console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
+	if(!validateClient(sock)){
+		telnetConects.push(sock)
+	}
+	
+   
     
     // Add a 'data' event handler to this instance of socket
     sock.on('data', function(data) {
@@ -84,6 +87,16 @@ net.createServer(function(sock) {
     
 }).listen('8000','192.168.129.178');
 
+function validateClient(sock){
+	var existingClient=false;
+	for (var i = telnetConects.length - 1; i >= 0; i--) {
+		if(telnetConects[i]==sock){
+			existingClient=true
+			break
+		}
+	}
+	return existingClient
+}
 
 server.bind(PORT, HOST);//UDP SERVER
 app.listen(3000);// SOCKET IO SERVER

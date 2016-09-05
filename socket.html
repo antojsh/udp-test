@@ -7,19 +7,17 @@
 </head>
 <body>
 	<script>
-		 var sock = new SockJS('http://localhost:3000/echo');
-		 sock.onopen = function() {
-		     console.log('open');
-		 };
-		 sock.onmessage = function(e) {
-		     console.log('message', e.data);
-		 };
-		 sock.onclose = function() {
-		     console.log('close');
-		 };
-
-		 sock.send('test');
-		 sock.close();
+		  	var socket = new WebSocket("ws://localhost:3000/ws")
+	        socket.onopen = function() {
+	            console.log('Conectado')
+	        };
+	        socket.onmessage = function (e) {
+	            console.log('nuevo mensaje '+e.data)
+	        }
+	        socket.onclose = function () {
+	            console.log('Conexion cerrada')
+	            
+	        }
 	</script>
 </body>
 </html>

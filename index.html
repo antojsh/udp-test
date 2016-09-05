@@ -60,8 +60,10 @@
   var div = document.getElementById('div')
   socket.on('news', function (data) {
   	if(bandera){
+  		
   		$('.list-group').append('<li class="list-group-item" value='+data+'>'+data+'</li>')
   		$('#div').scrollTop($('#div')[0].scrollHeight);
+  		
   	}
   });
 
